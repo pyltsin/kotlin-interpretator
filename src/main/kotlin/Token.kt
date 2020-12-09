@@ -1,6 +1,6 @@
 data class Token(
     val literal: String,
-    val tokenType: TokenType,
+    val type: TokenType,
 )
 
 
