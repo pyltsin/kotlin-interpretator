@@ -69,11 +69,11 @@ class Lexer(private val input: String) {
     }
 
     private fun isLetter(letter: String): Boolean {
-        return letter[0] in 'a'..'z' || letter[0] in 'A'..'Z' || letter[0] == '_'
+        return letter.isNotEmpty() && (letter[0] in 'a'..'z' || letter[0] in 'A'..'Z' || letter[0] == '_')
     }
 
     private fun isDigit(letter: String): Boolean {
-        return letter[0] in '0'..'9'
+        return letter.isNotEmpty() &&  letter[0] in '0'..'9'
     }
 
     private fun readString(): String {

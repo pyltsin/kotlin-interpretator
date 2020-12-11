@@ -5,7 +5,7 @@ class AstTest {
     @Test
     fun testString() {
         val program = AstProgram(
-            listOf(
+            mutableListOf(
                 AstLetStatement(
                     token = Token(literal = "let", type = TokenType.LET),
                     name = AstIdentifier(token = Token(literal = "myVar", type = TokenType.IDENT), value = "myVar"),

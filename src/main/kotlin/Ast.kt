@@ -11,7 +11,7 @@ interface AstExpression : AstNode {
 
 }
 
-class AstProgram(val statements: MutableList<AstStatement> = mutableListOf() ) : AstNode {
+class AstProgram(val statements: MutableList<AstStatement> = mutableListOf()) : AstNode {
     override fun tokenLiteral(): String {
         return if (statements.isNotEmpty()) {
             statements[0].tokenLiteral()
@@ -84,7 +84,7 @@ class AstReturnStatement(
 
 class AstExpressionStatement(
     val token: Token,
-    var expression: AstExpression? =null
+    var expression: AstExpression? = null
 ) : AstStatement {
     override fun tokenLiteral(): String {
         return token.literal
@@ -104,7 +104,7 @@ class AstIntegerLiteral(
     }
 
     override fun string(): String {
-        return value.toString() + ":" + token.literal
+        return value.toString()
     }
 }
 
@@ -117,7 +117,7 @@ class AstStringLiteral(
     }
 
     override fun string(): String {
-        return value.toString() + ":" + token.literal
+        return value.toString()
     }
 }
 
@@ -130,14 +130,14 @@ class AstBoolean(
     }
 
     override fun string(): String {
-        return value.toString() + ":" + token.literal
+        return value.toString()
     }
 }
 
 class AstPrefixExpression(
     val token: Token,
     val operator: String,
-    val right: AstExpression
+    var right: AstExpression? = null
 ) : AstExpression {
     override fun tokenLiteral(): String {
         return token.literal
@@ -147,7 +147,7 @@ class AstPrefixExpression(
         val builder: StringBuilder = StringBuilder()
         builder.append("(")
         builder.append(this.operator)
-        builder.append(this.right.string())
+        builder.append(this.right?.string())
         builder.append(")")
         return builder.toString()
     }
@@ -156,7 +156,7 @@ class AstPrefixExpression(
 class AstInfixExpression(
     val token: Token,
     val operator: String,
-    val right: AstExpression,
+    var right: AstExpression? = null,
     val left: AstExpression,
 ) : AstExpression {
     override fun tokenLiteral(): String {
@@ -168,7 +168,7 @@ class AstInfixExpression(
         builder.append("(")
         builder.append(this.left.string())
         builder.append(" " + this.operator + " ")
-        builder.append(this.right.string())
+        builder.append(this.right?.string())
         builder.append(")")
         return builder.toString()
     }
@@ -176,9 +176,9 @@ class AstInfixExpression(
 
 class AstIfExpression(
     val token: Token,
-    val condition: AstExpression,
-    val consequence: AstBlockStatement,
-    val alternative: AstBlockStatement?
+    var condition: AstExpression? = null,
+    var consequence: AstBlockStatement? = null,
+    var alternative: AstBlockStatement? = null
 ) : AstExpression {
     override fun tokenLiteral(): String {
         return token.literal
@@ -187,9 +187,9 @@ class AstIfExpression(
     override fun string(): String {
         val builder: StringBuilder = StringBuilder()
         builder.append("if")
-        builder.append(condition.string())
+        builder.append(condition?.string())
         builder.append(" ")
-        builder.append(consequence.string())
+        builder.append(consequence?.string())
         alternative?.apply {
             builder.append("else")
             builder.append(this.string())
@@ -217,8 +217,8 @@ class AstBlockStatement(
 
 class AstFunctionLiteral(
     val token: Token,
-    val parameters: MutableList<AstIdentifier> = mutableListOf(),
-    val body: AstBlockStatement
+    var parameters: MutableList<AstIdentifier>? = mutableListOf(),
+    var body: AstBlockStatement?=null
 ) : AstExpression {
     override fun tokenLiteral(): String {
         return token.literal
@@ -228,9 +228,9 @@ class AstFunctionLiteral(
         val builder: StringBuilder = StringBuilder()
         builder.append(this.tokenLiteral())
         builder.append("(")
-        builder.append(parameters.joinToString(separator = ", ") { it.string() })
+        builder.append(parameters?.joinToString(separator = ", ") { it.string() })
         builder.append(") ")
-        builder.append(body.string())
+        builder.append(body?.string())
         return builder.toString()
     }
 }
@@ -238,7 +238,7 @@ class AstFunctionLiteral(
 class AstCallExpression(
     val token: Token,
     val function: AstExpression,
-    val arguments: MutableList<AstExpression> = mutableListOf()
+    var arguments: MutableList<AstExpression> = mutableListOf()
 ) : AstExpression {
     override fun tokenLiteral(): String {
         return token.literal
@@ -256,7 +256,7 @@ class AstCallExpression(
 
 class AstArrayLiteral(
     val token: Token,
-    val elements: MutableList<AstExpression> = mutableListOf()
+    var elements: MutableList<AstExpression> = mutableListOf()
 ) : AstExpression {
     override fun tokenLiteral(): String {
         return token.literal
@@ -274,7 +274,7 @@ class AstArrayLiteral(
 class AstIndexExpression(
     val token: Token,
     val left: AstExpression,
-    val index: AstExpression
+    var index: AstExpression? = null
 ) : AstExpression {
     override fun tokenLiteral(): String {
         return token.literal
@@ -285,7 +285,7 @@ class AstIndexExpression(
         builder.append("(")
         builder.append(left.string())
         builder.append("[")
-        builder.append(index.string())
+        builder.append(index?.string())
         builder.append("])")
         return builder.toString()
     }
@@ -293,7 +293,7 @@ class AstIndexExpression(
 
 class AstHashLiteral(
     val token: Token,
-    val pairs: Map<AstExpression, AstExpression> = hashMapOf()
+    var pairs: MutableMap<AstExpression, AstExpression> = hashMapOf()
 ) : AstExpression {
     override fun tokenLiteral(): String {
         return token.literal
@@ -311,8 +311,8 @@ class AstHashLiteral(
 
 class AstMethodExpression(
     val token: Token,
-    val function: AstIdentifier,
-    val arguments: MutableList<AstExpression> = mutableListOf(),
+    var function: AstIdentifier?,
+    var arguments: MutableList<AstExpression> = mutableListOf(),
     val self: AstExpression
 ) : AstExpression {
     override fun tokenLiteral(): String {
@@ -323,7 +323,7 @@ class AstMethodExpression(
         val builder: StringBuilder = StringBuilder()
         builder.append(self.string())
         builder.append(".")
-        builder.append(function.string())
+        builder.append(function?.string())
         builder.append("(")
         builder.append(arguments.joinToString(separator = ", ") { it.string() })
         builder.append(")")
